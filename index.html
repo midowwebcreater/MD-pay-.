@@ -4,175 +4,260 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MD PAY</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-body{background:#f5f7fb;color:#111;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
+body{background:#0B0F19;color:#fff;}
 
-.app{max-width:420px;margin:auto;background:#f5f7fb;height:100vh;overflow:auto;padding-bottom:80px}
+/* APP */
+#app{display:none;padding-bottom:80px;}
+.page{display:none}
+.active{display:block}
+
+/* LOGIN */
+.center{display:flex;justify-content:center;align-items:center;height:100vh;}
+.card{
+background:#111827;
+padding:25px;
+border-radius:16px;
+width:320px;
+animation:fade 0.4s;
+}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:10px;}
+
+button{
+width:100%;
+padding:12px;
+margin:6px 0;
+border:none;
+border-radius:10px;
+background:#22c55e;
+color:#fff;
+cursor:pointer;
+}
 
 /* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  padding:16px;
-  font-weight:600;
-}
+.header{display:flex;justify-content:space-between;padding:15px;font-weight:600}
 
 /* BALANCE */
 .balance{
-  margin:12px;
-  padding:20px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#16a34a,#4ade80);
-  color:white;
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+margin:15px;
+padding:20px;
+border-radius:16px;
+background:linear-gradient(135deg,#22c55e,#4ade80);
 }
 
-/* ACTIONS */
-.actions{
-  display:flex;
-  justify-content:space-around;
-  margin:15px 0;
+/* GRID */
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+padding:10px;
 }
-
-.actions div{
-  text-align:center;
-}
-
-.actions span{
-  display:block;
-  background:white;
-  padding:12px;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
-}
-
-/* BANNER */
-.banner{
-  margin:12px;
-  padding:14px;
-  border-radius:14px;
-  background:linear-gradient(90deg,#facc15,#fb923c);
-  font-weight:600;
+.grid div{
+background:#111827;
+padding:15px;
+border-radius:12px;
+text-align:center;
+cursor:pointer;
 }
 
 /* CARD */
-.card{
-  background:white;
-  margin:12px;
-  padding:16px;
-  border-radius:14px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.08);
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-}
-
-/* MARKET */
-.market{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-/* BUTTON */
-.btn{
-  padding:8px 14px;
-  border:none;
-  border-radius:8px;
-  background:#16a34a;
-  color:white;
+.card2{
+background:#111827;
+margin:10px;
+padding:15px;
+border-radius:12px;
 }
 
 /* NAV */
 .nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  max-width:420px;
-  display:flex;
-  justify-content:space-around;
-  background:white;
-  padding:10px;
-  border-top:1px solid #ddd;
+position:fixed;
+bottom:0;
+width:100%;
+display:flex;
+justify-content:space-around;
+background:#111827;
+padding:10px;
 }
-
-.nav div{
-  text-align:center;
-  font-size:12px;
-}
-
-.active{color:#16a34a}
+.nav button{width:auto;padding:10px 15px;}
 </style>
+
 </head>
 
 <body>
 
-<div class="app">
+<!-- LOGIN -->
+<div id="loginPage" class="center">
+  <div class="card">
+    <h2>MD PAY</h2>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password">
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Signup</button>
+    <p style="font-size:12px;">user1 / 1234</p>
+  </div>
+</div>
 
-<!-- HEADER -->
+<!-- APP -->
+<div id="app">
+
 <div class="header">
   <span>MD PAY</span>
   <span>🔔</span>
 </div>
 
-<!-- BALANCE -->
-<div class="balance">
-  <p>Total Balance</p>
-  <h2>₹12,540</h2>
-  <p>Bonus ₹540</p>
-</div>
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="balance">
+    <h2>₹ <span id="bal"></span></h2>
+  </div>
 
-<!-- ACTIONS -->
-<div class="actions">
-  <div><span>💰</span>Deposit</div>
-  <div><span>📤</span>Withdraw</div>
-  <div><span>🎁</span>Rewards</div>
-  <div><span>👥</span>Team</div>
-</div>
-
-<!-- BANNER -->
-<div class="banner">
-  🔥 Bank 10% | UPI 7% Bonus
+  <div class="grid">
+    <div onclick="go('market')">Buy</div>
+    <div onclick="go('rewards')">Rewards</div>
+    <div onclick="go('team')">Team</div>
+    <div onclick="go('profile')">Profile</div>
+  </div>
 </div>
 
 <!-- MARKET -->
-<div class="card market">
-  <div>
-    <strong>₹1000</strong>
-    <p>+₹100</p>
+<div id="market" class="page">
+  <div class="card2">
+    ₹1000 <button onclick="buy(1000)">Buy</button>
   </div>
-  <button class="btn">Buy</button>
-</div>
-
-<div class="card market">
-  <div>
-    <strong>₹5000</strong>
-    <p>+₹500</p>
+  <div class="card2">
+    ₹5000 <button onclick="buy(5000)">Buy</button>
   </div>
-  <button class="btn">Buy</button>
 </div>
 
-<!-- HISTORY -->
-<div class="card">
-  <p>₹1000 - Success</p>
-  <p>₹500 - Pending</p>
+<!-- REWARDS -->
+<div id="rewards" class="page">
+  <div class="card2">
+    <button onclick="reward()">Claim ₹10</button>
+  </div>
 </div>
 
+<!-- TEAM -->
+<div id="team" class="page">
+  <div class="card2">
+    Invite Code: USER123
+  </div>
 </div>
 
-<!-- NAV -->
+<!-- PROFILE -->
+<div id="profile" class="page">
+  <div class="card2">
+    <button onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="page">
+  <div class="card2">
+    <button onclick="give()">Give ₹100</button>
+  </div>
+</div>
+
 <div class="nav">
-  <div class="active">Home</div>
-  <div>Market</div>
-  <div>Rewards</div>
-  <div>Team</div>
-  <div>Profile</div>
+  <button onclick="go('home')">Home</button>
+  <button onclick="go('market')">Market</button>
+  <button onclick="go('rewards')">Rewards</button>
+  <button onclick="go('team')">Team</button>
 </div>
+
+</div>
+
+<script>
+
+// DATA
+let users = JSON.parse(localStorage.getItem("users")) || {
+  user1:{pass:"1234",balance:500,role:"user"},
+  admin1:{pass:"admin123",balance:0,role:"admin"}
+};
+
+let currentUser=null;
+
+// LOGIN
+function login(){
+ let u=user.value,p=pass.value;
+
+ if(!users[u] || users[u].pass!==p){
+  alert("Invalid");
+  return;
+ }
+
+ currentUser=u;
+
+ loginPage.style.display="none";
+ app.style.display="block";
+
+ if(users[u].role==="admin"){
+  go("admin");
+ }else{
+  go("home");
+ }
+
+ update();
+}
+
+// SIGNUP
+function signup(){
+ users[user.value]={pass:pass.value,balance:0,role:"user"};
+ localStorage.setItem("users",JSON.stringify(users));
+ alert("Created");
+}
+
+// UPDATE
+function update(){
+ bal.innerText=users[currentUser].balance;
+}
+
+// BUY
+function buy(a){
+ if(users[currentUser].balance<a){alert("Low");return;}
+ users[currentUser].balance-=a;
+ save();
+}
+
+// REWARD
+function reward(){
+ users[currentUser].balance+=10;
+ save();
+}
+
+// ADMIN
+function give(){
+ users["user1"].balance+=100;
+ save();
+}
+
+// SAVE
+function save(){
+ localStorage.setItem("users",JSON.stringify(users));
+ update();
+}
+
+// LOGOUT
+function logout(){
+ location.reload();
+}
+
+// NAVIGATION
+function go(page){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+ if(page==="admin" && users[currentUser].role!=="admin"){
+  return;
+ }
+
+ document.getElementById(page).classList.add("active");
+}
+
+</script>
 
 </body>
-  </html>
+</html>
