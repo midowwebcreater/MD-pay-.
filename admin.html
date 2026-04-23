@@ -143,4 +143,161 @@ if(currentUser && users[currentUser] && users[currentUser].role!=="admin"){
 
 // 📦 DEMO ADMIN DATA
 let adminData = JSON.parse(localStorage.getItem("adminData")) || {
-  orders
+  orders:[
+    {id:1,user:"user1",amount:1000,status:"pending"},
+    {id:2,user:"user1",amount:5000,status:"pending"}
+  ],
+  withdraw:[
+    {id:1,user:"user1",amount:300,status:"pending"}
+  ],
+  logs:[]
+};
+
+// 🔄 SAVE
+function save(){
+  localStorage.setItem("adminData",JSON.stringify(adminData));
+  localStorage.setItem("users",JSON.stringify(users));
+  render();
+}
+
+// 📊 RENDER
+function render(){
+
+  // stats
+  let totalBal = 0;
+  Object.values(users).forEach(u=> totalBal += u.balance || 0);
+  document.getElementById("totalBal").innerText = "₹"+totalBal;
+
+  document.getElementById("pendingCount").innerText =
+    adminData.orders.filter(o=>o.status==="pending").length;
+
+  // orders
+  let ohtml="";
+  adminData.orders.forEach(o=>{
+    ohtml += `
+    <div class="item">
+      <div class="row">
+        <div>
+          ₹${o.amount} • ${o.user}<br>
+          <span class="badge ${o.status}">${o.status}</span>
+        </div>
+        <div>
+          <button class="btn green" onclick="approveOrder(${o.id})">✓</button>
+          <button class="btn red" onclick="rejectOrder(${o.id})">✕</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById("ordersList").innerHTML = ohtml || "<p>No orders</p>";
+
+  // withdraw
+  let whtml="";
+  adminData.withdraw.forEach(w=>{
+    whtml += `
+    <div class="item">
+      <div class="row">
+        <div>
+          ₹${w.amount} • ${w.user}<br>
+          <span class="badge ${w.status}">${w.status}</span>
+        </div>
+        <div>
+          <button class="btn green" onclick="approveWithdraw(${w.id})">✓</button>
+          <button class="btn red" onclick="rejectWithdraw(${w.id})">✕</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById("withdrawList").innerHTML = whtml || "<p>No requests</p>";
+
+  // logs
+  let lhtml="";
+  adminData.logs.forEach(l=> lhtml += `<div class="small">${l}</div>`);
+  document.getElementById("logsList").innerHTML = lhtml || "<p>No logs</p>";
+}
+
+// ✅ APPROVE ORDER
+function approveOrder(id){
+  let o = adminData.orders.find(x=>x.id===id);
+  if(!o) return;
+
+  users[o.user].balance += o.amount;
+
+  o.status="approved";
+  adminData.logs.unshift(`Order approved ₹${o.amount} for ${o.user}`);
+
+  save();
+}
+
+// ❌ REJECT ORDER
+function rejectOrder(id){
+  adminData.orders = adminData.orders.filter(x=>x.id!==id);
+  adminData.logs.unshift("Order rejected");
+  save();
+}
+
+// 💸 APPROVE WITHDRAW
+function approveWithdraw(id){
+  let w = adminData.withdraw.find(x=>x.id===id);
+  if(!w) return;
+
+  if(users[w.user].balance < w.amount){
+    alert("Insufficient balance");
+    return;
+  }
+
+  users[w.user].balance -= w.amount;
+
+  w.status="approved";
+  adminData.logs.unshift(`Withdraw approved ₹${w.amount}`);
+
+  save();
+}
+
+// ❌ REJECT WITHDRAW
+function rejectWithdraw(id){
+  adminData.withdraw = adminData.withdraw.filter(x=>x.id!==id);
+  adminData.logs.unshift("Withdraw rejected");
+  save();
+}
+
+// 👤 USER CONTROL
+function addToUser(){
+  let u = userName.value;
+  let amt = Number(amount.value);
+
+  if(!users[u]){ alert("User not found"); return; }
+
+  users[u].balance += amt;
+  adminData.logs.unshift(`Manual +₹${amt} to ${u}`);
+
+  save();
+}
+
+function deductFromUser(){
+  let u = userName.value;
+  let amt = Number(amount.value);
+
+  if(!users[u]){ alert("User not found"); return; }
+
+  users[u].balance -= amt;
+  adminData.logs.unshift(`Manual -₹${amt} from ${u}`);
+
+  save();
+}
+
+// 🔀 TABS
+function showTab(tab){
+  document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
+  document.getElementById(tab+"Tab").classList.remove("hidden");
+
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+// INIT
+render();
+
+</script>
+
+</body>
+</html>
