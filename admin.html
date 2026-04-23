@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MD PAY – Admin</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
+body{background:#0B0F19;color:#e5e7eb}
+.container{max-width:420px;margin:auto;padding-bottom:80px}
+
+/* HEADER */
+.header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px;font-weight:600
+}
+
+/* CARDS */
+.card{
+  background:#111827;border-radius:14px;padding:14px;margin:10px 12px;
+  box-shadow:0 6px 20px rgba(0,0,0,.35)
+}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+.stat{background:#111827;border-radius:14px;padding:14px}
+
+/* BADGE */
+.badge{padding:4px 8px;border-radius:8px;font-size:12px}
+.pending{background:#f59e0b;color:#000}
+.approved{background:#16a34a}
+.rejected{background:#dc2626}
+
+/* ROW */
+.row{display:flex;justify-content:space-between;align-items:center;margin:10px 0}
+
+/* BUTTON */
+.btn{
+  padding:8px 10px;border:none;border-radius:10px;margin-left:6px;cursor:pointer
+}
+.green{background:#16a34a;color:#fff}
+.red{background:#dc2626;color:#fff}
+.gray{background:#374151;color:#fff}
+
+/* INPUT */
+input{
+  width:100%;padding:10px;margin:8px 0;border-radius:10px;border:none;
+  background:#020617;color:#fff
+}
+
+/* TABLE LIST */
+.item{border-bottom:1px solid #1f2937;padding:10px 0}
+.small{font-size:12px;color:#9ca3af}
+
+/* TABS */
+.tabs{display:flex;gap:8px;padding:0 12px;margin-top:6px}
+.tab{flex:1;text-align:center;padding:10px;border-radius:10px;background:#111827;cursor:pointer}
+.tab.active{background:#16a34a}
+
+/* HIDDEN */
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+  <span>MD PAY – Admin</span>
+  <span>⚙️</span>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat">
+    <div class="small">Total Balance</div>
+    <div id="totalBal">₹0</div>
+  </div>
+  <div class="stat">
+    <div class="small">Pending Orders</div>
+    <div id="pendingCount">0</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('orders')">Orders</div>
+  <div class="tab" onclick="showTab('withdraw')">Withdraw</div>
+  <div class="tab" onclick="showTab('users')">Users</div>
+  <div class="tab" onclick="showTab('logs')">Logs</div>
+</div>
+
+<!-- ORDERS -->
+<div id="ordersTab" class="card">
+  <h3>Pending Orders</h3>
+  <div id="ordersList"></div>
+</div>
+
+<!-- WITHDRAW -->
+<div id="withdrawTab" class="card hidden">
+  <h3>Withdraw Requests</h3>
+  <div id="withdrawList"></div>
+</div>
+
+<!-- USERS -->
+<div id="usersTab" class="card hidden">
+  <h3>User Control</h3>
+
+  <input id="userName" placeholder="Username (e.g. user1)">
+  <input id="amount" placeholder="Amount">
+
+  <button class="btn green" onclick="addToUser()">Add Balance</button>
+  <button class="btn red" onclick="deductFromUser()">Deduct Balance</button>
+
+  <div id="userInfo" class="small" style="margin-top:10px"></div>
+</div>
+
+<!-- LOGS -->
+<div id="logsTab" class="card hidden">
+  <h3>Activity Logs</h3>
+  <div id="logsList"></div>
+</div>
+
+</div>
+
+<script>
+
+// 🔐 DEMO AUTH CHECK (optional)
+let users = JSON.parse(localStorage.getItem("users")) || {
+  user1:{pass:"1234",balance:500,role:"user"},
+  admin1:{pass:"admin123",balance:0,role:"admin"}
+};
+
+// optional guard
+let currentUser = localStorage.getItem("currentUser");
+if(currentUser && users[currentUser] && users[currentUser].role!=="admin"){
+  alert("Access denied");
+  location.href="index.html";
+}
+
+// 📦 DEMO ADMIN DATA
+let adminData = JSON.parse(localStorage.getItem("adminData")) || {
+  orders
