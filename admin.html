@@ -1,35 +1,65 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width">
-<title>MD PAY Admin</title>
+<body style="background:#0B0F19;color:#fff">
 
-<style>
-body{background:#0B0F19;color:#fff;font-family:Inter}
-.card{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-padding:15px;
-margin:10px;
-border-radius:12px;
-}
-button{
-background:#22c55e;
-border:none;
-padding:8px;
-color:#fff;
-border-radius:8px;
-}
-</style>
-</head>
+<h2>Admin</h2>
+<div id="list"></div>
 
-<body onload="loadAdmin()">
+<script type="module">
 
-<h2 style="text-align:center">Admin Panel</h2>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-<div id="deposits"></div>
+const app = initializeApp({
+  apiKey:"AIzaSyBFsnhl9kutSteTqVQO6wg8-tXpYBd6ldA",
+  projectId:"mdpay-e9abc"
+});
 
-<script type="module" src="app.js"></script>
+const db = getFirestore(app);
+
+// LOAD
+onSnapshot(collection(db,"deposits"),snap=>{
+  let html="";
+  snap.forEach(d=>{
+    let x=d.data();
+
+    if(x.status==="pending"){
+      html+=`
+      <div>
+        ₹${x.amount}
+        <button onclick="approve('${d.id}','${x.userId}',${x.amount})">
+        Approve</button>
+      </div>`;
+    }
+  });
+
+  list.innerHTML=html;
+});
+
+// APPROVE
+window.approve = async (id,uid,amt)=>{
+
+  const userRef = doc(db,"users",uid);
+  const snap = await getDoc(userRef);
+
+  await updateDoc(userRef,{
+    balance: snap.data().balance + amt
+  });
+
+  await updateDoc(doc(db,"deposits",id),{
+    status:"approved"
+  });
+
+};
+
+</script>
 
 </body>
 </html>
