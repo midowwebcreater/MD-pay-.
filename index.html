@@ -4,259 +4,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MD PAY</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
-body{background:#0B0F19;color:#fff;}
+:root{
+  --bg:#0B0F19;
+  --card:rgba(255,255,255,0.05);
+  --glass:rgba(255,255,255,0.08);
+  --primary:#22c55e;
+}
 
-/* APP */
-#app{display:none;padding-bottom:80px;}
-.page{display:none}
-.active{display:block}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
+body{background:var(--bg);color:#fff;overflow-x:hidden}
 
-/* LOGIN */
-.center{display:flex;justify-content:center;align-items:center;height:100vh;}
+/* GLASS */
 .card{
-background:#111827;
-padding:25px;
-border-radius:16px;
-width:320px;
-animation:fade 0.4s;
+  background:var(--glass);
+  backdrop-filter:blur(12px);
+  border-radius:16px;
+  padding:16px;
+  margin:10px;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+  transition:.3s;
 }
-@keyframes fade{from{opacity:0}to{opacity:1}}
+.card:hover{transform:translateY(-3px)}
 
-input{width:100%;padding:12px;margin:10px 0;border:none;border-radius:10px;}
-
-button{
-width:100%;
-padding:12px;
-margin:6px 0;
-border:none;
-border-radius:10px;
-background:#22c55e;
-color:#fff;
-cursor:pointer;
-}
+/* PAGE SYSTEM */
+.page{display:none;animation:fade .3s}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
 
 /* HEADER */
-.header{display:flex;justify-content:space-between;padding:15px;font-weight:600}
+.header{
+  display:flex;
+  justify-content:space-between;
+  padding:15px;
+  font-weight:600;
+}
 
 /* BALANCE */
 .balance{
-margin:15px;
-padding:20px;
-border-radius:16px;
-background:linear-gradient(135deg,#22c55e,#4ade80);
+  font-size:28px;
+  font-weight:600;
+  margin-top:5px;
 }
 
-/* GRID */
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-padding:10px;
-}
-.grid div{
-background:#111827;
-padding:15px;
-border-radius:12px;
-text-align:center;
-cursor:pointer;
+/* BUTTON */
+.btn{
+  background:var(--primary);
+  border:none;
+  color:#fff;
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
 }
 
-/* CARD */
-.card2{
-background:#111827;
-margin:10px;
-padding:15px;
-border-radius:12px;
+/* INPUT */
+input,select{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#020617;
+  color:#fff;
 }
 
 /* NAV */
 .nav{
-position:fixed;
-bottom:0;
-width:100%;
-display:flex;
-justify-content:space-around;
-background:#111827;
-padding:10px;
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  justify-content:space-around;
+  background:#111827;
+  padding:10px;
 }
-.nav button{width:auto;padding:10px 15px;}
-</style>
+.nav div{color:#aaa}
+.nav .active{color:#22c55e}
 
+/* SMALL */
+.small{font-size:12px;color:#aaa}
+</style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="loginPage" class="center">
+<div id="auth" class="page active">
   <div class="card">
     <h2>MD PAY</h2>
-    <input id="user" placeholder="Username">
-    <input id="pass" type="password">
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Signup</button>
-    <p style="font-size:12px;">user1 / 1234</p>
+    <input id="emailInput" placeholder="Email">
+    <input id="passInput" type="password" placeholder="Password">
+    <input id="refInput" placeholder="Referral (optional)">
+    <button class="btn" onclick="login()">Login</button>
+    <button class="btn" onclick="signup()">Signup</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app">
+<div id="app" class="page">
 
 <div class="header">
   <span>MD PAY</span>
-  <span>🔔</span>
+  <span id="uid"></span>
 </div>
 
-<!-- HOME -->
-<div id="home" class="page active">
-  <div class="balance">
-    <h2>₹ <span id="bal"></span></h2>
+<!-- WALLET -->
+<div id="wallet" class="page active">
+  <div class="card">
+    <div>Total Balance</div>
+    <div class="balance">₹<span id="bal">0</span></div>
   </div>
 
-  <div class="grid">
-    <div onclick="go('market')">Buy</div>
-    <div onclick="go('rewards')">Rewards</div>
-    <div onclick="go('team')">Team</div>
-    <div onclick="go('profile')">Profile</div>
+  <div class="card">
+    <h4>In Progress</h4>
+    <div id="progressList"></div>
   </div>
 </div>
 
 <!-- MARKET -->
 <div id="market" class="page">
-  <div class="card2">
-    ₹1000 <button onclick="buy(1000)">Buy</button>
-  </div>
-  <div class="card2">
-    ₹5000 <button onclick="buy(5000)">Buy</button>
+  <div class="card">
+    <h4>Buy Coins</h4>
+    <input id="buyAmt" placeholder="Enter Amount">
+    <button class="btn" onclick="startBuy()">Buy Now</button>
   </div>
 </div>
 
-<!-- REWARDS -->
-<div id="rewards" class="page">
-  <div class="card2">
-    <button onclick="reward()">Claim ₹10</button>
+<!-- PAYMENT -->
+<div id="payment" class="page">
+  <div class="card">
+    <h4>Complete Payment</h4>
+
+    <div class="small">Amount</div>
+    <div class="balance">₹<span id="showAmt">0</span></div>
+
+    <select id="methodSel">
+      <option value="bank">Bank</option>
+      <option value="upi">UPI</option>
+      <option value="crypto">Crypto</option>
+    </select>
+
+    <input id="utrInput" placeholder="Enter UTR">
+    <button class="btn" onclick="submitDeposit()">Submit</button>
+  </div>
+</div>
+
+<!-- WITHDRAW -->
+<div id="withdraw" class="page">
+  <div class="card">
+    <h4>Withdraw</h4>
+    <input id="wAmt" placeholder="Enter amount">
+    <button class="btn" onclick="submitWithdraw()">Request</button>
   </div>
 </div>
 
 <!-- TEAM -->
 <div id="team" class="page">
-  <div class="card2">
-    Invite Code: USER123
+  <div class="card">
+    <h4>Referral</h4>
+    <p>Your ID:</p>
+    <b id="uid2"></b>
   </div>
 </div>
 
 <!-- PROFILE -->
 <div id="profile" class="page">
-  <div class="card2">
-    <button onclick="logout()">Logout</button>
+  <div class="card">
+    <button class="btn" onclick="logout()">Logout</button>
   </div>
 </div>
 
-<!-- ADMIN -->
-<div id="admin" class="page">
-  <div class="card2">
-    <button onclick="give()">Give ₹100</button>
-  </div>
 </div>
 
+<!-- NAV -->
 <div class="nav">
-  <button onclick="go('home')">Home</button>
-  <button onclick="go('market')">Market</button>
-  <button onclick="go('rewards')">Rewards</button>
-  <button onclick="go('team')">Team</button>
+  <div onclick="go('wallet')">Home</div>
+  <div onclick="go('market')">Market</div>
+  <div onclick="go('payment')">Pay</div>
+  <div onclick="go('withdraw')">Withdraw</div>
+  <div onclick="go('profile')">Profile</div>
 </div>
 
-</div>
+<script type="module" src="app.js"></script>
 
 <script>
-
-// DATA
-let users = JSON.parse(localStorage.getItem("users")) || {
-  user1:{pass:"1234",balance:500,role:"user"},
-  admin1:{pass:"admin123",balance:0,role:"admin"}
-};
-
-let currentUser=null;
-
-// LOGIN
-function login(){
- let u=user.value,p=pass.value;
-
- if(!users[u] || users[u].pass!==p){
-  alert("Invalid");
-  return;
- }
-
- currentUser=u;
-
- loginPage.style.display="none";
- app.style.display="block";
-
- if(users[u].role==="admin"){
-  go("admin");
- }else{
-  go("home");
- }
-
- update();
-}
-
-// SIGNUP
-function signup(){
- users[user.value]={pass:pass.value,balance:0,role:"user"};
- localStorage.setItem("users",JSON.stringify(users));
- alert("Created");
-}
-
-// UPDATE
-function update(){
- bal.innerText=users[currentUser].balance;
-}
-
-// BUY
-function buy(a){
- if(users[currentUser].balance<a){alert("Low");return;}
- users[currentUser].balance-=a;
- save();
-}
-
-// REWARD
-function reward(){
- users[currentUser].balance+=10;
- save();
-}
-
-// ADMIN
-function give(){
- users["user1"].balance+=100;
- save();
-}
-
-// SAVE
-function save(){
- localStorage.setItem("users",JSON.stringify(users));
- update();
-}
-
-// LOGOUT
-function logout(){
- location.reload();
-}
-
 // NAVIGATION
-function go(page){
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 
- if(page==="admin" && users[currentUser].role!=="admin"){
-  return;
- }
-
- document.getElementById(page).classList.add("active");
+  if(id==="payment"){
+    showAmt.innerText = localStorage.getItem("payAmt") || 0;
+  }
 }
-
 </script>
 
 </body>
