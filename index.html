@@ -1,204 +1,122 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width">
 <title>MD PAY</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --bg:#0B0F19;
-  --card:rgba(255,255,255,0.05);
-  --glass:rgba(255,255,255,0.08);
-  --primary:#22c55e;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
-body{background:var(--bg);color:#fff;overflow-x:hidden}
-
-/* GLASS */
-.card{
-  background:var(--glass);
-  backdrop-filter:blur(12px);
-  border-radius:16px;
-  padding:16px;
-  margin:10px;
-  box-shadow:0 8px 30px rgba(0,0,0,.4);
-  transition:.3s;
-}
-.card:hover{transform:translateY(-3px)}
-
-/* PAGE SYSTEM */
-.page{display:none;animation:fade .3s}
-.page.active{display:block}
-@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
-
-/* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  padding:15px;
-  font-weight:600;
-}
-
-/* BALANCE */
-.balance{
-  font-size:28px;
-  font-weight:600;
-  margin-top:5px;
-}
-
-/* BUTTON */
-.btn{
-  background:var(--primary);
-  border:none;
-  color:#fff;
-  padding:10px;
-  border-radius:10px;
-  margin-top:10px;
-}
-
-/* INPUT */
-input,select{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:#020617;
-  color:#fff;
-}
-
-/* NAV */
-.nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  display:flex;
-  justify-content:space-around;
-  background:#111827;
-  padding:10px;
-}
-.nav div{color:#aaa}
-.nav .active{color:#22c55e}
-
-/* SMALL */
-.small{font-size:12px;color:#aaa}
+body{background:#0B0F19;color:#fff;font-family:Arial}
+.card{background:#111827;padding:15px;margin:10px;border-radius:10px}
+button{background:#22c55e;padding:10px;border:none;color:#fff}
+input{width:100%;padding:10px;margin:5px 0}
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="auth" class="page active">
+<div id="auth">
   <div class="card">
-    <h2>MD PAY</h2>
-    <input id="emailInput" placeholder="Email">
-    <input id="passInput" type="password" placeholder="Password">
-    <input id="refInput" placeholder="Referral (optional)">
-    <button class="btn" onclick="login()">Login</button>
-    <button class="btn" onclick="signup()">Signup</button>
+    <h2>Login</h2>
+    <input id="email">
+    <input id="pass" type="password">
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Signup</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app" class="page">
+<div id="app" style="display:none">
 
-<div class="header">
-  <span>MD PAY</span>
-  <span id="uid"></span>
-</div>
-
-<!-- WALLET -->
-<div id="wallet" class="page active">
   <div class="card">
-    <div>Total Balance</div>
-    <div class="balance">₹<span id="bal">0</span></div>
+    Balance ₹<span id="bal">0</span>
   </div>
 
   <div class="card">
-    <h4>In Progress</h4>
-    <div id="progressList"></div>
+    <input id="amt" placeholder="Amount">
+    <button onclick="buy()">Buy</button>
   </div>
-</div>
-
-<!-- MARKET -->
-<div id="market" class="page">
-  <div class="card">
-    <h4>Buy Coins</h4>
-    <input id="buyAmt" placeholder="Enter Amount">
-    <button class="btn" onclick="startBuy()">Buy Now</button>
-  </div>
-</div>
-
-<!-- PAYMENT -->
-<div id="payment" class="page">
-  <div class="card">
-    <h4>Complete Payment</h4>
-
-    <div class="small">Amount</div>
-    <div class="balance">₹<span id="showAmt">0</span></div>
-
-    <select id="methodSel">
-      <option value="bank">Bank</option>
-      <option value="upi">UPI</option>
-      <option value="crypto">Crypto</option>
-    </select>
-
-    <input id="utrInput" placeholder="Enter UTR">
-    <button class="btn" onclick="submitDeposit()">Submit</button>
-  </div>
-</div>
-
-<!-- WITHDRAW -->
-<div id="withdraw" class="page">
-  <div class="card">
-    <h4>Withdraw</h4>
-    <input id="wAmt" placeholder="Enter amount">
-    <button class="btn" onclick="submitWithdraw()">Request</button>
-  </div>
-</div>
-
-<!-- TEAM -->
-<div id="team" class="page">
-  <div class="card">
-    <h4>Referral</h4>
-    <p>Your ID:</p>
-    <b id="uid2"></b>
-  </div>
-</div>
-
-<!-- PROFILE -->
-<div id="profile" class="page">
-  <div class="card">
-    <button class="btn" onclick="logout()">Logout</button>
-  </div>
-</div>
 
 </div>
 
-<!-- NAV -->
-<div class="nav">
-  <div onclick="go('wallet')">Home</div>
-  <div onclick="go('market')">Market</div>
-  <div onclick="go('payment')">Pay</div>
-  <div onclick="go('withdraw')">Withdraw</div>
-  <div onclick="go('profile')">Profile</div>
-</div>
+<script type="module">
 
-<script type="module" src="app.js"></script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-<script>
-// NAVIGATION
-function go(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  onSnapshot,
+  addDoc,
+  collection,
+  updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  if(id==="payment"){
-    showAmt.innerText = localStorage.getItem("payAmt") || 0;
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBFsnhl9kutSteTqVQO6wg8-tXpYBd6ldA",
+  authDomain: "mdpay-e9abc.firebaseapp.com",
+  projectId: "mdpay-e9abc"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// SIGNUP
+window.signup = async ()=>{
+  const email = email.value;
+  const pass = pass.value;
+
+  const res = await createUserWithEmailAndPassword(auth,email,pass);
+
+  await setDoc(doc(db,"users",res.user.uid),{
+    balance:0,
+    role:"user"
+  });
+
+  alert("Signup done");
+};
+
+// LOGIN
+window.login = async ()=>{
+  await signInWithEmailAndPassword(auth,email.value,pass.value);
+};
+
+// AUTH STATE
+onAuthStateChanged(auth,(user)=>{
+  if(user){
+    auth.style.display="none";
+    app.style.display="block";
+
+    // realtime balance
+    onSnapshot(doc(db,"users",user.uid),(snap)=>{
+      bal.innerText = snap.data().balance;
+    });
   }
-}
+});
+
+// BUY
+window.buy = async ()=>{
+  const amt = Number(amt.value);
+
+  await addDoc(collection(db,"deposits"),{
+    userId:auth.currentUser.uid,
+    amount:amt,
+    status:"pending"
+  });
+
+  alert("Deposit request sent");
+};
+
 </script>
 
 </body>
